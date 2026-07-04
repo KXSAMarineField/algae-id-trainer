@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BC Algae ID Trainer</title>
+<meta name="description" content="Learn to identify BC intertidal algae species with photo quizzes and a browsable field guide.">
+<meta name="theme-color" content="#0e7c7b">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Algae ID">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- HOME SCREEN -->
+  <section id="screen-home" class="screen active">
+    <header class="hero">
+      <div class="hero-emoji">🌿🐚</div>
+      <h1>BC Algae ID Trainer</h1>
+      <p class="subtitle">Learn the Pacific Region dive-survey algae codes — based on the DFO 2018 Algae Identification Guide</p>
+    </header>
+
+    <div class="stats-bar" id="home-stats"></div>
+
+    <div class="mode-grid">
+      <button class="mode-card" data-mode="image-id">
+        <div class="mode-icon">📸</div>
+        <h2>Image ID Challenge</h2>
+        <p>See a real photo from the guide and pick the correct species &amp; code, multiple-choice style.</p>
+      </button>
+      <button class="mode-card" data-mode="browse">
+        <div class="mode-icon">📖</div>
+        <h2>Browse the Guide</h2>
+        <p>Flip through every species, code, and key ID facts — great for first-pass studying.</p>
+      </button>
+    </div>
+
+    <div class="filter-row">
+      <label for="category-select">Practice category</label>
+      <select id="category-select">
+        <option value="All">All species (60 codes)</option>
+        <option value="Green Algae">Green Algae</option>
+        <option value="Brown Algae">Brown Algae</option>
+        <option value="Red Algae">Red Algae</option>
+        <option value="Sea Grasses">Sea Grasses</option>
+        <option value="Others">Others</option>
+        <option value="General Codes">General / Morphology Codes (bonus)</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- IMAGE ID CHALLENGE -->
+  <section id="screen-image-id" class="screen">
+    <div class="game-topbar">
+      <button class="btn-back" data-back>&larr; Menu</button>
+      <div class="score-pills">
+        <span class="pill">Score <b id="iid-score">0</b></span>
+        <span class="pill streak">🔥 Streak <b id="iid-streak">0</b></span>
+        <span class="pill">Q <b id="iid-qnum">1</b>/<b id="iid-qtotal">15</b></span>
+      </div>
+    </div>
+
+    <div class="quiz-card">
+      <div id="iid-quiz-body">
+        <div class="quiz-photo-wrap">
+          <img id="iid-photo" src="" alt="Algae specimen">
+        </div>
+        <p class="quiz-prompt">Which species &amp; code is this?</p>
+        <div id="iid-options" class="options-grid"></div>
+        <div id="iid-feedback" class="feedback"></div>
+        <button id="iid-next" class="btn-primary hidden">Next →</button>
+      </div>
+      <div id="iid-results" class="hidden">
+        <h2>Round complete! 🌊</h2>
+        <p style="font-size:1.1rem;margin:10px 0;">Final score: <b id="iid-final-score">0</b></p>
+        <p style="color:#4a6b66;">Correct answers in a row earn bonus points — keep your streak alive next round!</p>
+        <button class="btn-primary" id="iid-replay">Play again</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- BROWSE GUIDE -->
+  <section id="screen-browse" class="screen">
+    <div class="game-topbar">
+      <button class="btn-back" data-back>&larr; Menu</button>
+      <div class="score-pills">
+        <span class="pill">Card <b id="browse-num">1</b>/<b id="browse-total">60</b></span>
+      </div>
+    </div>
+    <div class="flashcard-wrap">
+      <div id="flashcard" class="flashcard">
+        <div class="flashcard-inner">
+          <div class="flashcard-face flashcard-front">
+            <img id="browse-photo" src="" alt="">
+            <div class="browse-front-nophoto hidden" id="browse-front-nophoto">
+              <div class="browse-front-code" id="browse-front-code"></div>
+              <div class="browse-front-name" id="browse-front-name"></div>
+              <div class="browse-front-common" id="browse-front-common"></div>
+            </div>
+            <div class="browse-category" id="browse-category"></div>
+          </div>
+          <div class="flashcard-face flashcard-back">
+            <div class="browse-code" id="browse-code"></div>
+            <div class="browse-name" id="browse-name"></div>
+            <div class="browse-common hidden" id="browse-common"></div>
+            <ul class="browse-facts" id="browse-facts"></ul>
+            <div class="browse-confuse" id="browse-confuse"></div>
+          </div>
+        </div>
+      </div>
+      <p class="flip-hint">Tap the card to flip</p>
+      <div class="browse-nav">
+        <button id="browse-prev" class="btn-secondary">&larr; Prev</button>
+        <button id="browse-next" class="btn-secondary">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPECIES DETAIL POPUP -->
+  <div id="species-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+      <div class="modal-photo-wrap hidden" id="modal-photo-wrap">
+        <img id="modal-photo" src="" alt="">
+      </div>
+      <div class="modal-body">
+        <div class="modal-code" id="modal-code"></div>
+        <div class="modal-common hidden" id="modal-common"></div>
+        <div class="modal-sciname" id="modal-sciname"></div>
+        <div class="modal-meta" id="modal-meta"></div>
+        <ul class="modal-facts" id="modal-facts"></ul>
+        <div class="modal-confuse" id="modal-confuse"></div>
+      </div>
+      <button class="btn-primary" id="modal-continue">Continue</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>
